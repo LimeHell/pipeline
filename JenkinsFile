@@ -4,9 +4,20 @@ pipeline{
         timestamp()
     }
     stages{
-        stage("make a directory")
-        steps{
-            sh "mkdir jenkins-test"
+        stage("make a directory"){
+            steps{
+                sh "mkdir jenkins-test"
+            }
+        }
+        stage("add a file"){
+            steps{
+                sh "touch jenkins-test/BigNew.txt"
+            }
+        }
+    }
+    post {
+        always {
+            archiveArtifacts artifcats: "jenkins-test/BigNew.txt", allowEmptyArchive true
         }
     }
 }
