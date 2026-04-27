@@ -1,19 +1,27 @@
 pipeline{
+    agent any
+    options{
+        timeout(time: 5, unit: "MINUTES")
+        timestamps() 
+    }
     stages{
         stage("make a directory"){
+            options{
+                retry(2)
+            }
             steps{
                 sh "mkdir jenkins-test"
             }
         }
         stage("add a file"){
             steps{
-                sh "touch jenkins-test/BigNew.txt"
+                sh "touch jenkins-test/file1.txt"
             }
         }
-    }
+    } 
     post {
         always {
-            archiveArtifacts artifcats: "jenkins-test/BigNew.txt", allowEmptyArchive: true
+            archiveArtifacts artifacts: "jenkins-test/*.txt", allowEmptyArchive: true 
         }
     }
 }
