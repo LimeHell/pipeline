@@ -1,8 +1,4 @@
 pipeline{
-    options{
-        timeout(time: 5, "MINUTES")
-        timestamp()
-    }
     stages{
         stage("make a directory"){
             steps{
