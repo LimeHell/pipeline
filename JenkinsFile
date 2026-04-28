@@ -1,27 +1,38 @@
-pipeline{
+pipeline {
     agent any
-    options{
-        timeout(time: 5, unit: "MINUTES")
-        timestamps() 
+    
+    environment {
+        IMAGE_NAME = "my-app"
+        CONTAINER_NAME = "my-app-container"
     }
-    stages{
-        stage("make a directory"){
-            options{
-                retry(2)
-            }
-            steps{
-                sh "mkdir jenkins-test"
-            }
-        }
-        stage("add a file"){
-            steps{
-                sh "touch jenkins-test/file1.txt"
+    
+    stages {
+        stage('Init Dockerfile') {
+            steps {
+                    sh '''
+                        docker rm -f ${CONTAINER_NAME} || true
+                        docker rmi ${IMAGE_NAME} || true
+                        docker system prune -f
+                    '''
             }
         }
-    } 
-    post {
-        always {
-            archiveArtifacts artifacts: "jenkins-test/*.txt", allowEmptyArchive: true 
+        
+        stage('Build Dockerfile') {
+            steps {
+                sh '''
+                    docker build -t ${IMAGE_NAME} .
+                '''
+            }
+        }
+        
+        stage('Deploy Image') {
+            steps {
+                script {
+                    sh '''
+                        docker run -d --name ${CONTAINER_NAME} ${IMAGE_NAME}
+                    '''
+                }
+            }
         }
     }
 }
